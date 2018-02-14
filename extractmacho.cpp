@@ -153,7 +153,7 @@ bool IDAP_run(size_t)
         // lookup fat archives
         while (findAddress != BADADDR)
         {
-            findAddress = bin_search(findAddress, inf.max_ea, magicFat, NULL, 4, BIN_SEARCH_FORWARD, BIN_SEARCH_NOCASE);
+            findAddress = bin_search2(findAddress, inf.max_ea, magicFat, NULL, 4, BIN_SEARCH_FORWARD | BIN_SEARCH_NOCASE);
             if (findAddress != BADADDR)
             {
                 add_to_fat_list(findAddress);
@@ -181,7 +181,7 @@ bool IDAP_run(size_t)
         {
             while (findAddress != BADADDR)
             {
-                findAddress = bin_search(findAddress, inf.max_ea, archmagic[i], NULL, 4, BIN_SEARCH_FORWARD, BIN_SEARCH_NOCASE);
+                findAddress = bin_search2(findAddress, inf.max_ea, archmagic[i], NULL, 4, BIN_SEARCH_FORWARD | BIN_SEARCH_NOCASE);
                 struct found_fat *f = NULL;
                 HASH_FIND(hh, found_fat, &findAddress, 4, f);
                 if (findAddress != BADADDR && f == NULL)
