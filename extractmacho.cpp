@@ -40,7 +40,7 @@
 #include "validate.h"
 #include "uthash.h"
 
-#define VERSION "1.1.4"
+#define VERSION "1.1.5"
 //#define DEBUG 0
 
 uint8_t extract_binary(ea_t address, char *outputFilename);
@@ -78,7 +78,7 @@ int IDAP_init(void)
     msg("Extract Mach-O plugin loaded, v%s\n", VERSION);
     msg("(c) fG!, 2012 - reverser@put.as\n");
     msg("----------------------------------\n");
-//    if (inf.filetype != f_MACHO)
+//    if (inf_get_filetype() != f_MACHO)
 //    {
 //		// if it's not mach-o binary then plugin is unavailable
 //		msg("[macho plugin] Executable format must be Mach-O, not loading plugin!");
@@ -142,7 +142,7 @@ bool IDAP_run(size_t)
             return false;
         
         // we want to avoid dumping itself so we start at one byte ahead of the first address in the database
-        ea_t findAddress = inf.min_ea+1;
+        ea_t findAddress = inf_get_min_ea() + 1;
         uchar magicFat[]    = "\xCA\xFE\xBA\xBE";
         
         // we have a small problem here
@@ -153,7 +153,7 @@ bool IDAP_run(size_t)
         // lookup fat archives
         while (findAddress != BADADDR)
         {
-            findAddress = bin_search2(findAddress, inf.max_ea, magicFat, NULL, 4, BIN_SEARCH_FORWARD | BIN_SEARCH_NOCASE);
+            findAddress = bin_search2(findAddress, inf_get_max_ea(), magicFat, NULL, 4, BIN_SEARCH_FORWARD | BIN_SEARCH_NOCASE);
             if (findAddress != BADADDR)
             {
                 add_to_fat_list(findAddress);
@@ -168,7 +168,7 @@ bool IDAP_run(size_t)
             }
         }
 
-        findAddress = inf.min_ea+1;
+        findAddress = inf_get_min_ea() + 1;
         
 #define NR_ARCHS 4
         uchar* archmagic[NR_ARCHS];
@@ -181,7 +181,7 @@ bool IDAP_run(size_t)
         {
             while (findAddress != BADADDR)
             {
-                findAddress = bin_search2(findAddress, inf.max_ea, archmagic[i], NULL, 4, BIN_SEARCH_FORWARD | BIN_SEARCH_NOCASE);
+                findAddress = bin_search2(findAddress, inf_get_max_ea(), archmagic[i], NULL, 4, BIN_SEARCH_FORWARD | BIN_SEARCH_NOCASE);
                 struct found_fat *f = NULL;
                 HASH_FIND(hh, found_fat, &findAddress, 4, f);
                 if (findAddress != BADADDR && f == NULL)
@@ -200,7 +200,7 @@ bool IDAP_run(size_t)
                     findAddress += 1;
             }
             // reset start address
-            findAddress = inf.min_ea+1;
+            findAddress = inf_get_min_ea() + 1;
         }
     }
 
