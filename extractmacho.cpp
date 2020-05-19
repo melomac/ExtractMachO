@@ -72,7 +72,9 @@ struct report *report = NULL;
 #define TARGET_64  1
 #define TARGET_FAT 2
 
-static size_t IDAP_init(void)
+#define PLUGIN_KEEP  ((plugmod_t *)2)
+
+static plugmod_t * IDAP_init(void)
 {
     msg("----------------------------------\n");
     msg("Extract Mach-O plugin loaded, v%s\n", VERSION);
